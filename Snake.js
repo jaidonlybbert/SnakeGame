@@ -27,10 +27,6 @@ function Snake() {
   this.speedx = direction[0];
   this.speedy = direction[1];
 
-/*  this.update = function() {
-    this.posx[0] += direction[0] * DOT_SIZE;
-    this.posy[0] += direction[1] * DOT_SIZE;
-  } */
 
   this.draw = function() {
     ctx.fillStyle = SNAKE_COLOR;
@@ -45,10 +41,8 @@ function loop(game) {
   var eat = game.checkCollisions();
 
   if (gameRunning == true) {
-//    game.snake.update();
     game.move();
     game.draw();
-    console.log("yeet");
   }
 }
 
@@ -139,22 +133,18 @@ function Game() {
 
 function gameStart() {
   var game = new Game();
-  setInterval( function() { loop(game); }, 100);
+  setInterval(function() { loop(game); }, 100);
 }
 
 
 window.addEventListener("keydown", function (e) {
   if (e.keyCode == DOWN_ARROW && direction[1] == 0) {
-    console.log('down');
     direction = [0, 1];
   } else if (e.keyCode == UP_ARROW && direction[1] == 0) {
-    console.log('up');
     direction = [0, -1];
   } else if (e.keyCode == LEFT_ARROW && direction[0] == 0) {
-    console.log('left');
     direction = [-1, 0];
   } else if (e.keyCode == RIGHT_ARROW && direction[0] == 0) {
-    console.log('right');
     direction = [1, 0];
   }
 });
