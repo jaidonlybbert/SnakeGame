@@ -27,30 +27,26 @@ function Snake() {
   this.speedx = direction[0];
   this.speedy = direction[1];
 
-  this.update = function() {
+/*  this.update = function() {
     this.posx[0] += direction[0] * DOT_SIZE;
     this.posy[0] += direction[1] * DOT_SIZE;
-  }
+  } */
 
   this.draw = function() {
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0,0,WIDTH,HEIGHT);
-
     ctx.fillStyle = SNAKE_COLOR;
-    ctx.fillRect(this.posx,this.posy,DOT_SIZE,DOT_SIZE);
-  }
-
-  this.grow = function() {
-    
+    for (var i = 0; i < this.posx.length; i++) {
+      ctx.fillRect(this.posx[i],this.posy[i],DOT_SIZE,DOT_SIZE);
+    }
   }
 }
 
 
 function loop(game) {
-  game.checkCollisions();
+  var eat = game.checkCollisions();
 
   if (gameRunning == true) {
-    game.snake.update();
+//    game.snake.update();
+    game.move();
     game.draw();
     console.log("yeet");
   }
@@ -77,37 +73,72 @@ function Food() {
 function Game() {
   this.snake = new Snake();
   this.food = new Food();
-
   this.food.placeFood();
+  this.onFood = false;
 
   this.draw = function() {
-    this.snake.draw();
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0,0,WIDTH,HEIGHT);
+
     this.food.drawFood();
+    this.snake.draw();
+  }
+
+  this.move = function() {
+    if (this.onFood == true) {
+      this.snake.posx.push(this.snake.posx[this.snake.posx.length - 1]);
+      this.snake.posy.push(this.snake.posy[this.snake.posy.length - 1]);
+
+      for (var i = (this.snake.posx.length - 2); i > 0; i--) {
+        this.snake.posx[i] = this.snake.posx[i - 1];
+        this.snake.posy[i] = this.snake.posy[i - 1];
+      }
+      console.log("eat", this.snake.posx, "\n", this.snake.posy);
+    } else {
+      for (var i = (this.snake.posx.length - 1); i > 0; i--) {
+        this.snake.posx[i] = this.snake.posx[i - 1];
+        this.snake.posy[i] = this.snake.posy[i - 1];
+      }
+    }
+    this.snake.posx[0] += direction[0] * DOT_SIZE;
+    this.snake.posy[0] += direction[1] * DOT_SIZE;
+    console.log(this.snake.posx, "\n", this.snake.posy);
   }
 
   this.checkCollisions = function() {
     if (this.food.posx == this.snake.posx[0] && this.food.posy == this.snake.posy[0]) {
-      this.snake.grow();
       this.food.placeFood();
+      this.onFood = true;
     } else if (this.snake.posx[0] < 0 || this.snake.posx[0] > WIDTH - DOT_SIZE ||
                this.snake.posy[0] < 0 || this.snake.posy[0] > HEIGHT - DOT_SIZE) {
       this.endGame();
+      this.onFood = false;
+    } else {
+      this.onFood = false;
+    }
+
+    for (var i = 0; i < this.snake.posx.length; i++) {
+      if (i < 4) {
+        continue;
+      } else {
+        if (this.snake.posx[i] == this.snake.posx[0] && this.snake.posy[i] == this.snake.posy[0]) {
+          this.endGame();
+          this.onFood = false;
+        }
+      }
     }
   }
 
   this.endGame = function () {
     gameRunning = false;
     ctx.fillStyle = "FFF";
-    ctx.fillText("GAME OVER", 380, 380)
+    ctx.fillText("GAME OVER", 380, 380);
   }
 }
 
 
 function gameStart() {
   var game = new Game();
-
-  // OK... You cannot pass a function with an argument to setInterval(), you must
-  // encapsulate it in an un-named function
   setInterval( function() { loop(game); }, 100);
 }
 
